@@ -1,11 +1,22 @@
-# demo
-DataStructure
-LeetCode刷题总结，参考Labulabudong的算法小抄
-
-
 算法整理笔记
 
 # · 数据结构
+
+#### 环中求一点到另一点的步数
+
+int step = Math.min(Math.abs(pos[i-1]-j),Math.min(n-j+pos[i-1], n-pos[i-1]+j) );
+
+顺时针：
+
+​	i<=j step = j-i
+
+​	i>j step = n-i+j;
+
+逆时针：
+
+​	i<=j step = n-j+i;
+
+​	i>j step = i-j	
 
 ## Ⅰ、链表
 
@@ -3298,6 +3309,46 @@ private static List<Integer> seq = new LinkedList<>();
 
 
 
+#### 4. 最长回文子串
+
+```java
+import java.util.*;
+import java.util.regex.Pattern;
+
+public class Main{
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()){
+            String str = sc.nextLine();
+            int n = str.length();
+            // dp定义为当str[i,j]为回文子串时为真
+            boolean[][] dp = new boolean[n][n];
+            // 边界条件为长度为1和2的子串
+            for(int i = 0;i < n;i++){
+                dp[i][i] = true;
+                if(i+1 < n && str.charAt(i) == str.charAt(i+1))
+                    dp[i][i+1] = true;
+            }
+            
+            // 记录最大长度，如果要求最长子串，则使用begin记录开始index值，str.substring(begin, begin + maxLen)
+            int maxLength = 0;
+            for(int i = n-1;i >= 0;i--){
+                for(int j = i+1;j < n;j++){
+                    if(str.charAt(i) == str.charAt(j) && dp[i+1][j-1]){
+                        dp[i][j] = true;
+                        maxLength = Math.max((j-i+1),maxLength);
+                    }
+                }
+            }
+            System.out.println(maxLength);
+        }
+    }
+}
+
+```
+
+
+
 ### 四、子序列问题
 
 1.一维dp数组
@@ -4154,7 +4205,7 @@ int BFS(Node start, Node target) {
 
 ## VII、实现技巧
 
-### 一、.二维数组排序
+### 一、二维数组排序
 
 最好写成以下形式，不然在某些场合可能因为溢出出错
 
@@ -4189,7 +4240,7 @@ Arrays.sort(intervals,Comparator.comparingInt(a -> a[1]));
 
 
 
-### 二、位运算
+### 二、基础操作
 
 #### 1. n&(n-1)
 
@@ -4807,5 +4858,156 @@ void dfs(char[][] grid, int i, int j) {
     dfs(grid, i - 1, j);
     dfs(grid, i, j - 1);
 }
+```
+
+
+
+
+
+#### 16. 计算表达式
+
+使用Deque双向队列结构完成对字符的输入与删除
+
+[如何实现一个计算器 :: labuladong的算法小抄 (gitee.io)](https://labuladong.gitee.io/algo/4/33/136/)
+
+```java
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String str = sc.nextLine();
+        Deque<Character> deque = new LinkedList<>();
+        for(int i = 0; i < str.length(); i++){
+            //入队的时候就把空格排除在外，省的接下来再额外判断
+            if(str.charAt(i) != ' '){
+                deque.addLast(str.charAt(i));
+            }
+        }
+        System.out.println(calculate(deque));
+    }
+
+    public static int calculate(Deque<Character> deque){
+        Stack<Integer> stack = new Stack<>();
+        char sign = '+';    // 当前的符号
+        int num = 0;        // 当前的的数字
+
+        while (deque.size()>0){
+            char cur = deque.removeFirst();
+            if(Character.isDigit(cur)) {
+                num = num*10 + (cur-'0');
+            }
+            if(cur == '('){
+                num = calculate(deque);
+            }
+            // deque.size()==0是在处理最后一个数字，此时由于最后一个数字从deque中弹出，size==0
+            // 最后cur==')'也属于deque.size()==0
+            if((!Character.isDigit(cur) && cur!=' ') || deque.size()==0){
+                if(sign == '+')
+                    stack.push(num);
+                else if(sign == '-')
+                    stack.push(-num);
+                else if(sign == '*'){
+                    int pre = stack.pop();
+                    num = pre*num;
+                    stack.push(num);
+                }else if(sign == '/'){
+                    int pre = stack.pop();
+                    stack.push(pre/num);
+                }
+                num = 0;
+                sign = cur;
+            }
+            if(cur == ')')
+                break;
+        }
+
+        int res = 0;
+        while(!stack.isEmpty()){
+            res += stack.pop();
+        }
+        return res;
+    }
+}
+```
+
+
+
+#### 17. 最小公倍数/最大公约数
+
+```java
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNext()) {
+            int a = sc.nextInt();
+            int b = sc.nextInt();
+            // 最大公约数 * 最小公倍数 = a*b
+            System.out.println(a*b/gcd(a,b));
+        }
+    }
+	// 辗转相除法求最大公约数
+    public static int gcd(int a,int b){
+        if(a % b == 0)
+            return b;
+        else
+            return gcd(b,(a % b));
+    }
+}
+```
+
+
+
+### 三、基础Java操作
+
+#### 1. 字符串逆序
+
+```java
+new StringBuffer(str).reverse().toString()
+new StringBuilder(str).reverse().toString()
+```
+
+
+
+#### 2. map按值排序
+
+```java
+public class MapValSort {
+    public static void main(String[] args) {
+        // 必须是TreeMap有序结构
+        Map<String, Integer> maps = new TreeMap<String, Integer>();
+         
+        // 自定义比较器用于sort
+        Comparator<Map.Entry<Character,Integer>> cmp;
+        cmp = (o1, o2) -> (o1.getValue().equals(o2.getValue())) ? o1.getKey()-o2.getKey() : o2.getValue()-o1.getValue();
+        
+        // 将map转为list
+        List<Map.Entry<Character,Integer>> list = new ArrayList<>(map.entrySet());
+        list.sort(cmp);
+        
+        for(Map.Entry<Character,Integer> m : list){
+            System.out.print(m.getKey());
+        }
+    }
+}
+```
+
+
+
+#### 3. 进制转化
+
+![image-20220309214845939](C:\Users\QN\AppData\Roaming\Typora\typora-user-images\image-20220309214845939.png)
+
+
+
+#### 4. 分割字符
+
+```java
+// 匹配非字母的字符进行分割
+String[] words = str.split("[^A-Za-z]");
 ```
 
