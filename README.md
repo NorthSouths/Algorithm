@@ -1,22 +1,8 @@
 算法整理笔记
 
-# · 数据结构
+## **涵盖链表，树，图，动态规划，贪心算法，回溯算法等经典问题，**
 
-#### 环中求一点到另一点的步数
-
-int step = Math.min(Math.abs(pos[i-1]-j),Math.min(n-j+pos[i-1], n-pos[i-1]+j) );
-
-顺时针：
-
-​	i<=j step = j-i
-
-​	i>j step = n-i+j;
-
-逆时针：
-
-​	i<=j step = n-j+i;
-
-​	i>j step = i-j	
+## **以及一些基本的算法技巧**
 
 ## Ⅰ、链表
 
